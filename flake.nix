@@ -4,7 +4,8 @@
       {
         defaultPackage.${system} = with nixpkgs.legacyPackages.${system};
           stdenv.mkDerivation {
-            name = "brightness";
+            pname = "brightness";
+            version = "0.1.0";
             buildInputs = [ nodejs ];
             dontUnpack = true;
             js = ./brightness.js;
