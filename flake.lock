@@ -10,8 +10,9 @@
         "type": "github"
       },
       "original": {
-        "id": "flake-utils",
-        "type": "indirect"
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
       }
     },
     "nixpkgs": {
@@ -28,6 +29,20 @@
         "type": "indirect"
       }
     },
+    "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1607660847,
+        "narHash": "sha256-hTjqlKirCgD8mhJHj5btJlhRdL3WTt2zi6x6MllDzwM=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "2c0f6135aab77ff942b615228882c7dd996e0882",
+        "type": "github"
+      },
+      "original": {
+        "id": "nixpkgs",
+        "type": "indirect"
+      }
+    },
     "root": {
       "inputs": {
         "nixpkgs": "nixpkgs",
@@ -36,16 +51,20 @@
     },
     "utils": {
       "inputs": {
-        "flake-utils": "flake-utils"
+        "flake-utils": "flake-utils",
+        "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "narHash": "sha256-9jRtc9uJdnwhq76T0v9vXfdxpmL0W7P9I164ykECkyc=",
-        "path": "/home/mason/git/flake-utils",
-        "type": "path"
+        "lastModified": 1607971648,
+        "narHash": "sha256-YPS5qB+cnmV5xKsTMUyU1udmscIls6vbkdoRCSoaKbI=",
+        "owner": "ursi",
+        "repo": "flake-utils",
+        "rev": "3a39444700665688ab47d4e65c4eb928c879e3b5",
+        "type": "github"
       },
       "original": {
-        "path": "/home/mason/git/flake-utils",
-        "type": "path"
+        "id": "utils",
+        "type": "indirect"
       }
     }
   },
