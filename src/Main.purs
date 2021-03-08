@@ -14,7 +14,11 @@ import Stdin as Stdin
 
 main :: Effect Unit
 main =
-  Task.run do
+  Task.capture
+    ( case _ of
+        Left e -> logShow e
+        Right _ -> pure unit
+    ) do
     configPath <-
       liftEffect $ getHomedir
         <#> \homedir -> Path.concat [ homedir, ".brightness" ]
