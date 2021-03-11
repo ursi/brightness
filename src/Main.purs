@@ -1,11 +1,16 @@
 module Main where
 
 import MasonPrelude
+import Data.Array.NonEmpty as NEA
 import Data.Number as Number
+import Data.String as String
+import Data.String.Regex as RE
+import Data.String.Regex.Flags (noFlags)
 import Effect.Exception (Error)
+import Effect.Exception as Ex
 import Node.Path as Path
 import Node.Process as Process
-import Task (Task)
+import Task (Task, throwError)
 import Task as Task
 import Task.File as File
 import Task.ChildProcess as CP
@@ -27,7 +32,8 @@ main =
         <#> Number.fromString
         .> fromMaybe 1.0
     logShow current
-    keypressLoop $ keypressHandler configPath $ defaultBrightness { current = current }
+    monitor <- getMonitor
+    keypressLoop $ keypressHandler monitor configPath $ defaultBrightness { current = current }
 
 foreign import getHomedir :: Effect String
 
@@ -47,8 +53,8 @@ defaultBrightness =
   , lower: 0.0
   }
 
-keypressHandler :: String -> Brightness -> Handler Error
-keypressHandler configPath brightness =
+keypressHandler :: String -> String -> Brightness -> Handler Error
+keypressHandler monitor configPath brightness =
   Handler \{ name, ctrl } ->
     if name == "c" && ctrl then
       liftEffect $ Process.exit 0
@@ -71,12 +77,12 @@ keypressHandler configPath brightness =
             brightness
       in
         do
-          setBrightness configPath newBrightness.current
-          pure $ keypressHandler configPath newBrightness
+          setBrightness monitor configPath newBrightness.current
+          pure $ keypressHandler monitor configPath newBrightness
 
-setBrightness :: String -> Number -> Task Error Unit
-setBrightness configPath b = do
-  _ <- CP.exec ("xrandr --output HDMI-0 --brightness " <> show b) CP.defaultExecOptions
+setBrightness :: String -> String -> Number -> Task Error Unit
+setBrightness monitor configPath b = do
+  _ <- CP.exec ("xrandr --output " <> monitor <> " --brightness " <> show b) CP.defaultExecOptions
   File.write configPath $ show b
   logShow b
 
@@ -85,3 +91,12 @@ keypressLoop (Handler handler) =
   Stdin.getKeypress
     >>= handler
     >>= keypressLoop
+
+getMonitor :: Task Error String
+getMonitor = do
+  let
+    error = throwError $ Ex.error "uh oh"
+  rawText <- String.trim <$> CP.exec ("xrandr --listactivemonitors") CP.defaultExecOptions
+  case RE.regex """[^ ]+$""" noFlags of
+    Right re -> maybe error pure $ RE.match re rawText >>= NEA.head
+    Left _ -> error
