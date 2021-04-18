@@ -1,25 +1,47 @@
-{
-  inputs.psnp.url = "github:ursi/psnp";
+{ inputs =
+    { nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+      purs-nix.url = "github:ursi/purs-nix";
+      utils.url = "github:ursi/flake-utils";
+    };
 
-  outputs = { self, nixpkgs, utils, psnp }:
-    let
-      system = "x86_64-linux";
-      pkgs = nixpkgs.legacyPackages.${system};
-    in
-      {
-        defaultPackage.${system} =
-            (import ./psnp.nix { inherit pkgs; })
-              .overrideAttrs (old: { buildInputs = [ pkgs.xorg.xrandr ] ++ old.buildInputs; });
+  outputs = { nixpkgs, utils, purs-nix, ... }:
+    utils.defaultSystems
+      ({ make-shell, pkgs, system }:
+         let
+           inherit (purs-nix { inherit system; }) purs ps-pkgs ps-pkgs-ns;
+           inherit
+             (purs
+                { dependencies =
+                    with ps-pkgs-ns;
+                    with ps-pkgs;
+                    [ node-process
+                      numbers
+                      task
+                      ursi.prelude
+                      ursi.task-file
+                      ursi.task-node-child-process
+                    ];
 
-        devShell.${system} = with pkgs;
-          mkShell {
-            buildInputs = [
-              dhall
-              nodejs
-              psnp.defaultPackage.${system}
-              purescript
-              spago
-            ];
-          };
-      };
+                  src = ./src;
+                }
+             )
+             modules
+             shell;
+         in
+         { defaultPackage =
+             (modules.Main.install { name = "brightness"; })
+             .overrideAttrs (old: { buildInputs = [ pkgs.xorg.xrandr ] ++ old.buildInputs; });
+
+           devShell =
+             make-shell
+               { packages =
+                   with pkgs;
+                   [ nodejs
+                     purescript
+                     (shell {})
+                   ];
+               };
+         }
+      )
+      nixpkgs;
 }
