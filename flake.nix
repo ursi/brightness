@@ -1,14 +1,14 @@
 { inputs =
     { nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
       purs-nix.url = "github:ursi/purs-nix";
-      utils.url = "github:ursi/flake-utils";
+      utils.url = "github:ursi/flake-utils/2";
     };
 
-  outputs = { nixpkgs, utils, purs-nix, ... }:
-    utils.defaultSystems
-      ({ make-shell, pkgs, system }:
+  outputs = { utils, ... }@inputs:
+    utils.default-systems
+      ({ make-shell, pkgs, purs-nix, ... }:
          let
-           inherit (purs-nix { inherit system; }) purs ps-pkgs ps-pkgs-ns;
+           inherit (purs-nix) purs ps-pkgs ps-pkgs-ns;
            inherit
              (purs
                 { dependencies =
@@ -22,11 +22,11 @@
                       ursi.task-node-child-process
                     ];
 
-                  src = ./src;
+                  srcs = [ ./src ];
                 }
              )
              modules
-             shell;
+             command;
          in
          { defaultPackage =
              (modules.Main.install { name = "brightness"; })
@@ -37,11 +37,12 @@
                { packages =
                    with pkgs;
                    [ nodejs
-                     purescript
-                     (shell {})
+                     purs-nix.purescript
+                     purs-nix.purescript-language-server
+                     (command {})
                    ];
                };
          }
       )
-      nixpkgs;
+      inputs;
 }
