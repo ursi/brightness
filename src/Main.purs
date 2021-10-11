@@ -31,8 +31,8 @@ main =
       File.read configPath
         <#> Number.fromString
         .> fromMaybe 1.0
-    logShow current
     monitor <- getMonitor
+    setBrightness monitor configPath current
     keypressLoop $ keypressHandler monitor configPath $ defaultBrightness { current = current }
 
 foreign import getHomedir :: Effect String
