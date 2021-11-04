@@ -33,7 +33,13 @@ main =
         .> fromMaybe 1.0
     monitor <- getMonitor
     setBrightness monitor configPath current
-    keypressLoop $ keypressHandler monitor configPath $ defaultBrightness { current = current }
+    keypressLoop
+      (keypressHandler monitor configPath
+       $ defaultBrightness
+           { upper = if current > 1.0 then current else defaultBrightness.upper
+           , current = current
+           }
+      )
 
 foreign import getHomedir :: Effect String
 
