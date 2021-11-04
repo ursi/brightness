@@ -60,12 +60,18 @@ keypressHandler monitor configPath brightness =
       liftEffect $ Process.exit 0
     else
       let
+        atTop = brightness.current == brightness.upper
+        newTop = brightness.upper * 2.0
+
         newBrightness =
           if name == "r" then
             defaultBrightness
           else if name == "up" then
             brightness
-              { current = (brightness.current + brightness.upper) / 2.0
+              { upper = if atTop then newTop else brightness.upper
+              , current =
+                  if atTop then newTop
+                  else (brightness.current + brightness.upper) / 2.0
               , lower = brightness.current
               }
           else if name == "down" then
