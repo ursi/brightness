@@ -29,7 +29,7 @@
              command;
          in
          { defaultPackage =
-             (modules.Main.install { name = "brightness"; })
+             (modules.Main.app { name = "brightness"; })
              .overrideAttrs (old: { buildInputs = [ pkgs.xorg.xrandr ] ++ old.buildInputs; });
 
            devShell =
