@@ -72,6 +72,8 @@ keypressHandler monitor configPath brightness =
         newBrightness =
           if name == "r" then
             defaultBrightness
+          else if name == "a" then
+            defaultBrightness { current = brightness.current }
           else if name == "up" then
             brightness
               { upper = if atTop then newTop else brightness.upper
