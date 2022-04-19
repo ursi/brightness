@@ -79,12 +79,12 @@ keypressHandler monitor configPath brightness =
               { upper = if atTop then newTop else brightness.upper
               , current =
                   if atTop then newTop
-                  else (brightness.current + brightness.upper) / 2.0
+                  else round' $ (brightness.current + brightness.upper) / 2.0
               , lower = brightness.current
               }
           else if name == "down" then
             brightness
-              { current = (brightness.current + brightness.lower) / 2.0
+              { current = round' $ (brightness.current + brightness.lower) / 2.0
               , upper = brightness.current
               }
           else
@@ -114,3 +114,6 @@ getMonitor = do
   case RE.regex """[^ ]+$""" noFlags of
     Right re -> maybe error pure $ RE.match re rawText >>= NEA.head
     Left _ -> error
+
+round' :: Number -> Number
+round' n = toNumber (round $ n * 1000.0) / 1000.0
