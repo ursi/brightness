@@ -28,11 +28,11 @@
              modules
              command;
          in
-         { defaultPackage =
+         { packages.default =
              (modules.Main.app { name = "brightness"; })
              .overrideAttrs (old: { buildInputs = [ pkgs.xorg.xrandr ] ++ old.buildInputs; });
 
-           devShell =
+           devShells.default =
              make-shell
                { packages =
                    with pkgs;
